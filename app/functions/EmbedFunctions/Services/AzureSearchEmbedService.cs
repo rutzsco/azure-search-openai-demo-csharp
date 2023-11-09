@@ -14,6 +14,7 @@ public sealed partial class AzureSearchEmbedService(
     SearchIndexClient searchIndexClient,
     DocumentAnalysisClient documentAnalysisClient,
     BlobContainerClient corpusContainerClient,
+    PDFChunkingService pdfChunkingService,
     ILogger<AzureSearchEmbedService>? logger) : IEmbedService
 {
     [GeneratedRegex("[^0-9a-zA-Z_-]")]
@@ -24,8 +25,14 @@ public sealed partial class AzureSearchEmbedService(
         try
         {
             await EnsureSearchIndexAsync(searchIndexName);
+
+
+            using var ms = new MemoryStream();
+            blobStream.CopyTo(ms);
+            ms.Position = 0;
+
             Console.WriteLine($"Embedding blob '{blobName}'");
-            var pageMap = await GetDocumentTextAsync(blobStream, blobName);
+            var pageMap = await GetDocumentTextAsync(ms, blobName);
 
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(blobName);
 
@@ -37,8 +44,9 @@ public sealed partial class AzureSearchEmbedService(
                 await UploadCorpusAsync(corpusName, page.Text);
             }
 
+            ms.Position = 0;
+            await pdfChunkingService.UploadBlobsAsync(ms, blobName);
             var sections = CreateSections(pageMap, blobName);
-
             await IndexSectionsAsync(searchIndexName, sections, blobName);
 
             return true;
@@ -101,8 +109,7 @@ public sealed partial class AzureSearchEmbedService(
             }
         };
 
-        logger?.LogInformation(
-                       "Creating '{searchIndexName}' search index", searchIndexName);
+        logger?.LogInformation("Creating '{searchIndexName}' search index", searchIndexName);
 
         await searchIndexClient.CreateIndexAsync(index);
     }
@@ -114,8 +121,7 @@ public sealed partial class AzureSearchEmbedService(
         {
             if (page.Values.Any(indexName => indexName == searchIndexName))
             {
-                logger?.LogWarning(
-                    "Search index '{SearchIndexName}' already exists", searchIndexName);
+                logger?.LogWarning("Search index '{SearchIndexName}' already exists", searchIndexName);
                 return;
             }
         }
@@ -374,8 +380,17 @@ public sealed partial class AzureSearchEmbedService(
 
         return length - 1;
     }
-
-    private static string BlobNameFromFilePage(string blobName, int page = 0) => blobName;
+    private static string BlobNameFromFilePage(string blobName, int page = 0)
+    {
+        if (Path.GetExtension(blobName).ToLower() is ".pdf")
+        {
+            return $"{Path.GetFileNameWithoutExtension(blobName)}-{page}.pdf";
+        }
+        else
+        {
+            return Path.GetFileName(blobName);
+        }
+    }
 
     private async Task IndexSectionsAsync(string searchIndexName, IEnumerable<Section> sections, string blobName)
     {

@@ -40,15 +40,15 @@ public class ReadRetrieveReadChatService
         var excludeCategory = overrides?.ExcludeCategory ?? null;
         var filter = excludeCategory is null ? null : $"category ne '{excludeCategory}'";
         IChatCompletion chat = _kernel.GetService<IChatCompletion>();
-        ITextEmbeddingGeneration? embedding = _kernel.GetService<ITextEmbeddingGeneration>();
+        //ITextEmbeddingGeneration? embedding = _kernel.GetService<ITextEmbeddingGeneration>();
         float[]? embeddings = null;
         var question = history.LastOrDefault()?.User is { } userQuestion
             ? userQuestion
             : throw new InvalidOperationException("Use question is null");
-        if (overrides?.RetrievalMode != "Text" && embedding is not null)
-        {
-            embeddings = (await embedding.GenerateEmbeddingAsync(question, cancellationToken: cancellationToken)).ToArray();
-        }
+        //if (overrides?.RetrievalMode != "Text" && embedding is not null)
+        //{
+        //    embeddings = (await embedding.GenerateEmbeddingAsync(question, cancellationToken: cancellationToken)).ToArray();
+        //}
 
         // step 1
         // use llm to get query if retrieval mode is not vector

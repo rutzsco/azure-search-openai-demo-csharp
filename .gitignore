@@ -483,3 +483,4 @@ env/
 venv/
 myvenv/
 ENV/
+app/backend/appsettings.Development.json

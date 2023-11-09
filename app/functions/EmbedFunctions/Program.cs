@@ -8,12 +8,20 @@ var host = new HostBuilder()
     {
         var credential = new DefaultAzureCredential();
 
-        static Uri GetUriFromEnvironment(string variable) => Environment.GetEnvironmentVariable(variable) is string value &&
+        static Uri GetUriFromEnvironment(string variable)
+        {
+            if (Environment.GetEnvironmentVariable(variable) is string value &&
                 Uri.TryCreate(value, UriKind.Absolute, out Uri? uri) &&
-                uri is not null
-                ? uri
-                : throw new ArgumentException(
+                uri is not null)
+            {
+                return uri;
+            }
+            else
+            {
+                throw new ArgumentException(
                 $"Unable to parse URI from environment variable: {variable}");
+            }
+        }
 
         services.AddAzureClients(builder =>
         {
@@ -49,6 +57,16 @@ var host = new HostBuilder()
             return containerClient;
         });
 
+
+        services.AddSingleton<PDFChunkingService>(_ =>
+        {
+            var blobServiceClient = new BlobServiceClient(
+                GetUriFromEnvironment("AZURE_STORAGE_BLOB_ENDPOINT"),
+                credential);
+
+            return new PDFChunkingService(blobServiceClient);
+        });
+
         services.AddSingleton<EmbedServiceFactory>();
         services.AddSingleton<EmbeddingAggregateService>();
 
@@ -64,9 +82,11 @@ var host = new HostBuilder()
             var searchIndexClient = provider.GetRequiredService<SearchIndexClient>();
             var blobContainerClient = provider.GetRequiredService<BlobContainerClient>();
             var documentClient = provider.GetRequiredService<DocumentAnalysisClient>();
+
+            var pdfChunkingService = provider.GetRequiredService<PDFChunkingService>();
             var logger = provider.GetRequiredService<ILogger<AzureSearchEmbedService>>();
 
-            return new AzureSearchEmbedService(openAIClient, embeddingModelName, searchClient, searchIndexName, searchIndexClient, documentClient, blobContainerClient, logger);
+            return new AzureSearchEmbedService(openAIClient, embeddingModelName, searchClient, searchIndexName, searchIndexClient, documentClient, blobContainerClient, pdfChunkingService, logger);
         });
     })
     .ConfigureFunctionsWorkerDefaults()
