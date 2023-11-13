@@ -16,4 +16,6 @@ public record RequestOverrides
     public string? PromptTemplatePrefix { get; set; }
     public string? PromptTemplateSuffix { get; set; }
     public bool SuggestFollowupQuestions { get; set; } = true;
+
+    public bool ChatGPT4 { get; set; } = false;
 }

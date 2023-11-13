@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
+using Azure.AI.OpenAI;
+
 namespace MinimalApi.Extensions;
 
 internal static class SearchClientExtensions
@@ -99,5 +101,43 @@ internal static class SearchClientExtensions
         }
 
         return sb.ToArray();
+    }
+
+    internal static async Task<IReadOnlyList<KnowledgeSource>> SimpleHybridSearchAsync(this SearchClient searchClient, OpenAIClient openAIClient, string query, string aircraft)
+    {
+        // Generate the embedding for the query  
+        var queryEmbeddings = await GenerateEmbeddingsAsync(query, openAIClient);
+
+        // Perform the vector similarity search  
+        var searchOptions = new SearchOptions
+        {
+            Size = 35,
+            Select = { "sourcepage", "sourcefile", "content", "model" },
+            Filter = $"model eq '{aircraft}'"
+        };
+
+
+        var vectorQuery = new RawVectorQuery
+        {
+            KNearestNeighborsCount =  35,
+            Vector = queryEmbeddings.ToArray(),
+        };
+        vectorQuery.Fields.Add("embedding");
+        searchOptions.VectorQueries.Add(vectorQuery);
+
+        var response = await searchClient.SearchAsync<KnowledgeSource>(query, searchOptions);
+
+        var list = new List<KnowledgeSource>();
+        foreach (var result in response.Value.GetResults())
+        {
+            list.Add(result.Document);
+        }
+        return list;
+    }
+
+    private static async Task<ReadOnlyMemory<float>> GenerateEmbeddingsAsync(string text, OpenAIClient openAIClient)
+    {
+        var response = await openAIClient.GetEmbeddingsAsync(new EmbeddingsOptions("embedding", new string[] { text }));
+        return response.Value.Data[0].Embedding;
     }
 }
