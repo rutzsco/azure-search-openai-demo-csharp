@@ -33,4 +33,31 @@ internal static class ChatTurnExtensions
 
         return historyTextResult;
     }
+
+    internal static string GetChatHistoryAsText2(this ChatTurn[] history, bool includeLastTurn = true, int approximateMaxTokens = 1_000)
+    {
+        var historyTextResult = string.Empty;
+        var skip = includeLastTurn ? 0 : 1;
+
+        foreach (var turn in history.SkipLast(skip).Reverse())
+        {
+            var historyText = $"user: {turn.User}";
+
+            if (turn.Bot is not null)
+            {
+                historyText += $"""
+                    {turn.Bot}
+                    """;
+            }
+
+            historyTextResult = historyText + historyTextResult;
+
+            if (historyTextResult.Length > approximateMaxTokens * 4)
+            {
+                return historyTextResult;
+            }
+        }
+
+        return historyTextResult;
+    }
 }
