@@ -80,13 +80,12 @@ internal static class WebApplicationExtensions
 
     private static async Task<IResult> OnPostChatAsync(
         ChatRequest request,
-        ReadRetrieveReadChatService chatService,
+        ReadRetrieveReadChatServiceEnhanced chatService,
         CancellationToken cancellationToken)
     {
         if (request is { History.Length: > 0 })
         {
-            var response = await chatService.ReplyAsync(
-                request.History, request.Overrides, cancellationToken);
+            var response = await chatService.ReplyAsync(request.History, request.Overrides, cancellationToken);
 
             return TypedResults.Ok(response);
         }
