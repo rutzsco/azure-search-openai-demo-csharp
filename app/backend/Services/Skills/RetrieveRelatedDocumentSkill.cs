@@ -36,7 +36,7 @@ public sealed class RetrieveRelatedDocumentSkill
         var sourceType = context.Variables["sourceType"];
 
         IReadOnlyList<KnowledgeSource> sources = new List<KnowledgeSource>();
-        sources = await _searchClientFacade.SearchClientManualIndex.SimpleHybridSearchAsync(_openAIClient, searchQuery, aircraft);
+        sources = await _searchClientFacade.SearchClient.SimpleHybridSearchAsync(_openAIClient, searchQuery, aircraft);
         if (!sources.Any())
         {
             throw new InvalidOperationException("fail to get search result");

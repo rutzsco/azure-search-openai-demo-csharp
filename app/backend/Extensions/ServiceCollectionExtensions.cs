@@ -118,18 +118,8 @@ internal static class ServiceCollectionExtensions
         });
         services.AddSingleton<SearchClientFacade>(sp =>
         {
-            var config = sp.GetRequiredService<IConfiguration>();
-            var (azureSearchServiceEndpoint, azureSearchManualIndex, azureSearchReportIndex, azureSearchYouTubeIndex, azureSearchServiceKey) =
-                (config["AzureSearchServiceEndpoint"], config["AzureSearchManualIndex"], config["AzureSearchReportIndex"], config["AzureSearchYouTubeIndex"], config["AzureSearchServiceEndpointKey"]);
-
-            ArgumentNullException.ThrowIfNullOrEmpty(azureSearchServiceEndpoint);
-            ArgumentNullException.ThrowIfNullOrEmpty(azureSearchServiceKey);
-
-            var searchManualClient = new SearchClient(new Uri(azureSearchServiceEndpoint), azureSearchManualIndex, new AzureKeyCredential(azureSearchServiceKey));
-            var searchReportClient = new SearchClient(new Uri(azureSearchServiceEndpoint), azureSearchReportIndex, new AzureKeyCredential(azureSearchServiceKey));
-            var searchYouTubeClient = new SearchClient(new Uri(azureSearchServiceEndpoint), azureSearchYouTubeIndex, new AzureKeyCredential(azureSearchServiceKey));
-
-            return new SearchClientFacade(searchManualClient, searchReportClient, searchYouTubeClient);
+            var searchClient = sp.GetRequiredService<SearchClient>();
+            return new SearchClientFacade(searchClient);
         });
         services.AddSingleton<AzureBlobStorageService>();
         services.AddSingleton<ReadRetrieveReadChatService>();

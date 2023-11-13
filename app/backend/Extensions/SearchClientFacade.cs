@@ -4,15 +4,12 @@ namespace MinimalApi.Extensions;
 
 public class SearchClientFacade
 {
-    public SearchClientFacade(SearchClient searchClientManualIndex, SearchClient searchClientReportIndex, SearchClient searchClientYouTubeIndex)
+    public SearchClientFacade(SearchClient searchClientManualIndex)
     {
-        SearchClientManualIndex = searchClientManualIndex;
-        SearchClientReportIndex = searchClientReportIndex;
-        SearchClientYouTubeIndex = searchClientYouTubeIndex;
+        SearchClient = searchClientManualIndex;
     }
 
-    public SearchClient SearchClientManualIndex { get; set; }
-    public SearchClient SearchClientReportIndex { get; set; }
-    public SearchClient SearchClientYouTubeIndex { get; set; }
+    public SearchClient SearchClient { get; set; }
+
 }
 

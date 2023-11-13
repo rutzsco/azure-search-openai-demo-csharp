@@ -12,6 +12,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Services\Prompts\ChatSystemPrompt.txt" />
+    <None Remove="Services\Prompts\ChatUserPrompt.txt" />
+    <None Remove="Services\Prompts\SearchSystemPrompt.txt" />
+    <None Remove="Services\Prompts\SearchUserPrompt.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Services\Prompts\ChatSystemPrompt.txt" />
+    <EmbeddedResource Include="Services\Prompts\ChatUserPrompt.txt" />
+    <EmbeddedResource Include="Services\Prompts\SearchSystemPrompt.txt" />
+    <EmbeddedResource Include="Services\Prompts\SearchUserPrompt.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Azure.AI.FormRecognizer" />
     <PackageReference Include="Azure.AI.OpenAI" />
     <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" />
