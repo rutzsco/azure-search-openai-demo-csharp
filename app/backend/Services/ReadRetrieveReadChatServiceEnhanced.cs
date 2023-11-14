@@ -10,7 +10,7 @@ using Microsoft.SemanticKernel.Orchestration;
 using Microsoft.SemanticKernel.Planning;
 using Microsoft.SemanticKernel.Planning.Sequential;
 using Microsoft.SemanticKernel.TemplateEngine;
-using Microsoft.SemanticKernel.TemplateEngine.Prompt;
+//using Microsoft.SemanticKernel.TemplateEngine.Prompt;
 using MinimalApi.Extensions;
 using MinimalApi.Services.Prompts;
 using MinimalApi.Services.Skills;

@@ -122,7 +122,7 @@ internal static class ServiceCollectionExtensions
             return new SearchClientFacade(searchClient);
         });
         services.AddSingleton<AzureBlobStorageService>();
-        services.AddSingleton<ReadRetrieveReadChatService>();
+        //services.AddSingleton<ReadRetrieveReadChatService>();
         services.AddSingleton<ReadRetrieveReadChatServiceEnhanced>();
         return services;
     }

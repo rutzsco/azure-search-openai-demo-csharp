@@ -103,7 +103,7 @@ internal static class SearchClientExtensions
         return sb.ToArray();
     }
 
-    internal static async Task<IReadOnlyList<KnowledgeSource>> SimpleHybridSearchAsync(this SearchClient searchClient, OpenAIClient openAIClient, string query, string aircraft)
+    internal static async Task<IReadOnlyList<KnowledgeSource>> SimpleHybridSearchAsync(this SearchClient searchClient, OpenAIClient openAIClient, string query)
     {
         // Generate the embedding for the query  
         var queryEmbeddings = await GenerateEmbeddingsAsync(query, openAIClient);
@@ -112,8 +112,8 @@ internal static class SearchClientExtensions
         var searchOptions = new SearchOptions
         {
             Size = 35,
-            Select = { "sourcepage", "sourcefile", "content", "model" },
-            Filter = $"model eq '{aircraft}'"
+            Select = { "sourcepage", "sourcefile", "content"},
+            //Filter = $"model eq '{aircraft}'"
         };
 
 
@@ -135,9 +135,9 @@ internal static class SearchClientExtensions
         return list;
     }
 
-    private static async Task<ReadOnlyMemory<float>> GenerateEmbeddingsAsync(string text, OpenAIClient openAIClient)
+    private static async Task<IReadOnlyList<float>> GenerateEmbeddingsAsync(string text, OpenAIClient openAIClient)
     {
-        var response = await openAIClient.GetEmbeddingsAsync(new EmbeddingsOptions("embedding", new string[] { text }));
+        var response = await openAIClient.GetEmbeddingsAsync("text-embedding", new EmbeddingsOptions(text));
         return response.Value.Data[0].Embedding;
     }
 }

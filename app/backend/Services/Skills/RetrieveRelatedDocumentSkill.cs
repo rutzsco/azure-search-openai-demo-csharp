@@ -32,11 +32,11 @@ public sealed class RetrieveRelatedDocumentSkill
         var searchQuery = context.Variables["searchQuery"].Replace("\"", string.Empty);
 
         context.Variables["intent"] = searchQuery;
-        var aircraft = context.Variables["aircraft"];
-        var sourceType = context.Variables["sourceType"];
+        //var aircraft = context.Variables["aircraft"];
+        //var sourceType = context.Variables["sourceType"];
 
         IReadOnlyList<KnowledgeSource> sources = new List<KnowledgeSource>();
-        sources = await _searchClientFacade.SearchClient.SimpleHybridSearchAsync(_openAIClient, searchQuery, aircraft);
+        sources = await _searchClientFacade.SearchClient.SimpleHybridSearchAsync(_openAIClient, searchQuery);
         if (!sources.Any())
         {
             throw new InvalidOperationException("fail to get search result");
@@ -52,7 +52,7 @@ public sealed class RetrieveRelatedDocumentSkill
             var text = document.FormatAsOpenAISourceText();
             sourceSize += text.Length;
             tokenSize += tikToken.Encode(text).Count;
-            if (tokenSize > 12000)
+            if (tokenSize > DefaultSettings.MaxRequestTokens)
             {
                 break;
             }

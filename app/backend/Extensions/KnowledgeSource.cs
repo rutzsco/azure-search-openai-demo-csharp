@@ -10,8 +10,6 @@ public class KnowledgeSource
 
     public required string content { get; set; }
 
-    public required string model { get; set; }
-
     public string FormatAsOpenAISourceText()
     {
         return $"<source><name>{sourcepage}</name><content> {content.Replace('\r', ' ').Replace('\n', ' ')}</content></source>";
