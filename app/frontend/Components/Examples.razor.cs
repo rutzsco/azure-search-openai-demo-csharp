@@ -9,7 +9,7 @@ public sealed partial class Examples
 
     private string WhatIsIncluded { get; } = "what type of oil do i use for an oil change?";
     private string WhatIsPerfReview { get; } = "What is the part number for the oil filter?";
-    private string WhatDoesPmDo { get; } = "What type of wipers do I need?";
+    private string WhatDoesPmDo { get; } = "What is the part number for wiper replacement?";
 
     private async Task OnClickedAsync(string exampleText)
     {
